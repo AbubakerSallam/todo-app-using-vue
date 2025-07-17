@@ -1,18 +1,31 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { defineEmits, reactive, ref } from 'vue';
+import TodoButton from './TodoButton.vue';
 
-const todo = ref("Testing");
-
+const emit = defineEmits(["create-todo"]);
 const todoState = reactive({
-    todo: "Testing",
+    todo: "",
+    invalid: null,
+    errMsg: "",
 });
+const createTodo = () => {
+    todoState.invalid = null;
+    if (todoState.todo !== "") {
+        emit("create-todo", todoState.todo);
+        todoState.todo = "";
+        return;
+    }
+    todoState.invalid = true;
+    todoState.errMsg = "لايمكن ان تكون المهمة فارغة";
+};
+
 </script>
 <template>
-    <div class="input-wrap">
+    <div class="input-wrap" :class="{ 'input-err': todoState.invalid }">
         <input type="text" v-model="todoState.todo">
-        <button>انشاء</button>
+        <TodoButton @click="createTodo()" />
     </div>
-    <p>{{ todoState.todo }}</p>
+    <p class="err-msg" v-show="todoState.invalid"> {{ todoState.errMsg }}</p>
 </template>
 
 
@@ -22,6 +35,10 @@ const todoState = reactive({
     display: flex;
     transition: 250ms ease;
     border: 2px solid #41b880;
+
+    &.input-err {
+        border-color: red;
+    }
 
     &:focus-within {
         box-shadow: 0 -4px 6px -1px rgp(0 0 0 / 0.1),
@@ -38,11 +55,14 @@ const todoState = reactive({
         }
     }
 
-    button {
-        padding: 8px 16px;
-        border: none;
-        font-family: 'Playpen Sans Arabic',
+}
 
-    }
+.err-msg {
+    margin-top: 6px;
+    font-size: 12px;
+    text-align: center;
+    color: red;
+
+
 }
 </style>

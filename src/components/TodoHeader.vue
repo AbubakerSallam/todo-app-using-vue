@@ -26,16 +26,15 @@ header {
     nav {
         display: flex;
         align-items: center;
-        padding: 25px 16px;
+        padding: 10px 36px;
 
         .branding {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 2px;
 
             img {
                 max-width: 50px;
-
             }
 
             h1 {
@@ -53,7 +52,6 @@ header {
             a {
                 text-decoration: none;
                 color: inherit;
-
             }
         }
     }

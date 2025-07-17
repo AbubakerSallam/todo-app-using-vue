@@ -1,12 +1,48 @@
 <script setup>
-import TodoCreator from '@/components/TodoCreator.vue';
+import { ref } from 'vue';
+import { uid } from 'uid';
+import { Icon } from '@iconify/vue';
 
+import TodoCreator from '@/components/TodoCreator.vue';
+import TodoItem from '@/components/TodoItem.vue';
+const todoList = ref([]);
+const createTodo = (todo) => {
+  todoList.value.push({
+    id: uid(),
+    todo,
+    isCompleted: null,
+    isEditing: null,
+  });
+}
+
+const toggleComplete = (todoPos) => {
+  todoList.value[todoPos].isCompleted = !todoList.value[todoPos].isCompleted;
+}
+const toggleEditTodo = (todoPos) => {
+  todoList.value[todoPos].isEditing = !todoList.value[todoPos].isEditing;
+}
+const updateTodo = (todoVal, todoPos) => {
+  todoList.value[todoPos].todo = todoVal;
+}
+const deleteTodo = (todoId) => {
+  todoList.value = todoList.value.filter((todo) => todo.id != todoId);
+}
 </script>
 
 <template>
   <main>
     <h1>انشاء مهمة</h1>
-    <TodoCreator />
+    <TodoCreator @create-todo="createTodo" />
+
+    <ul class="todo-list" v-if="todoList.length > 0">
+      <TodoItem v-for="(todo, index) in todoList" :todo="todo" :index="index" @toggle-complete="toggleComplete"
+        @edit-todo="toggleEditTodo" @update-todo="updateTodo" @delete-todo="deleteTodo" />
+    </ul>
+    <p class="todos-msg" v-else>
+      <span>ليس لديك اي مهمات حتى الان! اضف مهامك</span>
+      <Icon class="icon" icon="noto-v1:sad-but-relieved-face" color="#41n080" width="22" />
+
+    </p>
   </main>
 </template>
 
@@ -19,10 +55,10 @@ main {
   max-width: 500px;
   width: 100%;
   margin: 0 auto;
-  padding: 40px 16px;
+  padding: 20px 16px;
 
   h1 {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     text-align: center;
   }
 
