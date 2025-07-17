@@ -1,11 +1,31 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { uid } from 'uid';
 import { Icon } from '@iconify/vue';
 
 import TodoCreator from '@/components/TodoCreator.vue';
 import TodoItem from '@/components/TodoItem.vue';
 const todoList = ref([]);
+
+watch(todoList, () => {
+  saveTodoListToLocalStorage();
+}, {
+  deep: true,
+});
+const feachTodoList = () => {
+  const savedTodoList = JSON.parse(localStorage.getItem("todoList"));
+  if (savedTodoList) {
+    todoList.value = savedTodoList;
+  }
+}
+const todoCompleted = computed(() => {
+  return todoList.value.every((todo) => todo.isCompleted);
+});
+feachTodoList();
+
+const saveTodoListToLocalStorage = () => {
+  localStorage.setItem("todoList", JSON.stringify(todoList.value));
+}
 const createTodo = (todo) => {
   todoList.value.push({
     id: uid(),
@@ -25,7 +45,7 @@ const updateTodo = (todoVal, todoPos) => {
   todoList.value[todoPos].todo = todoVal;
 }
 const deleteTodo = (todoId) => {
-  todoList.value = todoList.value.filter((todo) => todo.id != todoId);
+  todoList.value = todoList.value.filter((todo) => todo.id !== todoId);
 }
 </script>
 
@@ -41,6 +61,11 @@ const deleteTodo = (todoId) => {
     <p class="todos-msg" v-else>
       <span>ليس لديك اي مهمات حتى الان! اضف مهامك</span>
       <Icon class="icon" icon="noto-v1:sad-but-relieved-face" color="#41n080" width="22" />
+
+    </p>
+    <p v-if="todoCompleted && todoList.length > 0" class="todos-msg">
+      <span>تهانينا , اكملت جميع المهام ! </span>
+      <Icon class="icon" icon="noto-v1:party-popper" />
 
     </p>
   </main>
@@ -62,5 +87,8 @@ main {
     text-align: center;
   }
 
+}
+.todos-msg{
+  text-align: center;
 }
 </style>
